@@ -3,14 +3,22 @@ package com.dukelight.testbeautifului;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 
 public class ScrollingActivity extends AppCompatActivity {
+
+    private LinearLayout mLlNavi;
+    private AppBarLayout mAppBar;
+    private CoordinatorLayout mCoordinator;
+    private NestedScrollView mScrollView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,33 +38,42 @@ public class ScrollingActivity extends AppCompatActivity {
             //Then call setStatusBarColor.
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(Color.BLACK);
-
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        mLlNavi = findViewById(R.id.ll_navi);
+        mAppBar = findViewById(R.id.app_bar);
+        mCoordinator = findViewById(R.id.coordinator);
+        mScrollView = findViewById(R.id.scroll_view);
+
+        mAppBar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (verticalOffset == 0) {
+
+                }
+                System.out.println("verticalOffset=" + verticalOffset);
+            }
+        });
+        mAppBar.setAlpha(0f);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mScrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+                @Override
+                public void onScrollChange(View view, int i, int i1, int i2, int i3) {
+                    System.out.println("i=" + i + ",i1=" + i1);
+
+                    if (i1 < 300) {
+                        mAppBar.setAlpha(i1 * (1 / 300f));
+                    } else {
+                        mAppBar.setAlpha(1f);
+                    }
+                }
+            });
+        }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_scrolling, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-        return super.onOptionsItemSelected(item);
-    }
 }
